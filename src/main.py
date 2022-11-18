@@ -7,6 +7,7 @@ Created on Thu Nov 17 09:37:52 2022
 """
 
 import argparse
+
 from project import test_skript as ts
 
 if __name__ == "__main__":
@@ -14,9 +15,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--ek", help="The EK group.", type=int, default=1)
     parser.add_argument(
-        "--do_not_preprocess",
-        help="Do not run preprocessing.",
-        action="store_false",
+        "--do_not_preprocess", help="Do not run preprocessing.", action="store_false",
     )
     parser.add_argument(
         "--do_not_engineer",

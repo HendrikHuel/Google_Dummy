@@ -6,17 +6,17 @@ Created on Thu Nov 17 09:41:11 2022
 @author: huelsbusch
 """
 import sys
+
 import dask
 
 sys.path.insert(0, "src")
 
+import pickle
 from pathlib import Path
 
-import pandas as pd
-import numpy as np
 import lightgbm as lgb
-
-import pickle
+import numpy as np
+import pandas as pd
 
 from project.get_project_root import get_project_root
 
@@ -47,9 +47,7 @@ def preprocess_data(df: pd.DataFrame):
     return df
 
 
-def save_preprocessed(
-    df: pd.DataFrame, fname: str, ek: int = 1, root: Path = ROOT
-):
+def save_preprocessed(df: pd.DataFrame, fname: str, ek: int = 1, root: Path = ROOT):
     """
     Save preprocessed data to data/intermediate/preprocessed/ek{str(ek).zfill(3)}.
     Parameters
@@ -68,13 +66,7 @@ def save_preprocessed(
     None.
 
     """
-    prep_dir = (
-        root
-        / "data"
-        / "intermediate"
-        / "preprocessed"
-        / f"ek{str(ek).zfill(3)}"
-    )
+    prep_dir = root / "data" / "intermediate" / "preprocessed" / f"ek{str(ek).zfill(3)}"
 
     df.reset_index(drop=True, inplace=True)
     df.to_feather(prep_dir / fname)
@@ -155,13 +147,7 @@ def read_preprocessed(ek: int = 1, root: Path = ROOT):
         A concatenated Version of the preprocessed data.
 
     """
-    prep_dir = (
-        root
-        / "data"
-        / "intermediate"
-        / "preprocessed"
-        / f"ek{str(ek).zfill(3)}"
-    )
+    prep_dir = root / "data" / "intermediate" / "preprocessed" / f"ek{str(ek).zfill(3)}"
 
     @dask.delayed
     def read_feather(f):
@@ -248,10 +234,7 @@ def add_all_features(df: pd.DataFrame):
 
 
 def save_engineered(
-    df: pd.DataFrame,
-    ek: int = 1,
-    fname: str = "engineered_data",
-    root: Path = ROOT,
+    df: pd.DataFrame, ek: int = 1, fname: str = "engineered_data", root: Path = ROOT,
 ):
     """
     Save the engineered data to .feather in
@@ -273,9 +256,7 @@ def save_engineered(
     None.
 
     """
-    int_dir = (
-        root / "data" / "intermediate" / "engineered" / f"ek{str(ek).zfill(3)}"
-    )
+    int_dir = root / "data" / "intermediate" / "engineered" / f"ek{str(ek).zfill(3)}"
 
     df.reset_index(inplace=True, drop=True)
 
@@ -309,9 +290,7 @@ def run_engineering(ek: int = 1):
 #######################
 
 
-def read_engineered(
-    ek: int = 1, fname: str = "engineered_data", root: Path = ROOT
-):
+def read_engineered(ek: int = 1, fname: str = "engineered_data", root: Path = ROOT):
     """
     Read the pre-engineered data from
     "data/intermediate/engineered/f"ek{str(ek).zfill(3)}".
@@ -332,9 +311,7 @@ def read_engineered(
 
     """
 
-    int_dir = (
-        root / "data" / "intermediate" / "engineered" / f"ek{str(ek).zfill(3)}"
-    )
+    int_dir = root / "data" / "intermediate" / "engineered" / f"ek{str(ek).zfill(3)}"
     df = pd.read_feather(int_dir / f"{fname}.feather")
 
     return df
@@ -383,17 +360,12 @@ def train_lgb(
         free_raw_data=False,
     )
 
-    lgbm = lgb.train(
-        params,
-        dtrain,
-    )
+    lgbm = lgb.train(params, dtrain,)
 
     return lgbm
 
 
-def save_lgb(
-    lgbm, ek: int = 1, model_name: str = "test_model", root: Path = ROOT
-):
+def save_lgb(lgbm, ek: int = 1, model_name: str = "test_model", root: Path = ROOT):
     """
     Save the lgb as pickle in "data/intermediate/models/f"ek{str(ek).zfill(3)}".
 
@@ -414,9 +386,7 @@ def save_lgb(
     None.
 
     """
-    model_dir = (
-        root / "data" / "intermediate" / "models" / f"ek{str(ek).zfill(3)}"
-    )
+    model_dir = root / "data" / "intermediate" / "models" / f"ek{str(ek).zfill(3)}"
 
     with (model_dir / f"{model_name}.pkl").open("wb") as f:
         pickle.dump(lgbm, f)
@@ -450,10 +420,7 @@ def run_training_pipe(ek: int = 1):
 
 
 def preprocess_and_train(
-    ek: int = 1,
-    preprocess: bool = True,
-    engineer: bool = True,
-    train: bool = True,
+    ek: int = 1, preprocess: bool = True, engineer: bool = True, train: bool = True,
 ):
     """
     Controlls the feature engineering and model estimation pipelines for an "ek".
@@ -478,7 +445,7 @@ def preprocess_and_train(
     Each "ek" has several hundreds of these input .csv files in total. On very infrequent
     basis the preprocessing has to be re-run for all files. For example, in te case when a bug is discovered or the preprocessing was
     enhanced. For our biggest "ek"s the processing of all .csv's can take up to four hours using
-    parrallelisation where 4 files are processed at once. This is why the
+    parallelisation where 4 files are processed at once. This is why the
     preprocessing in this dummy app uses dask, because sometimes we need it.
 
 
